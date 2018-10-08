@@ -182,7 +182,7 @@ func (f *sendReceiveFolder) pull() bool {
 	tries := 0
 
 	for {
-		changed, finished := f.pullerIteration(curIgnores, ignoresChanged, scanChan)
+		changed, finished := f.pullerIteration(curIgnores, folderFiles, ignoresChanged, scanChan)
  		if finished {
  			tries++
  		}
@@ -382,7 +382,7 @@ func (f *sendReceiveFolder) processNeeded(ignores *ignore.Matcher, folderFiles *
 
 	select {
 	case <-f.ctx.Done():
-		return changed, nil, nil, f.ctx.Err()
+		return changed, finished, nil, nil, f.ctx.Err()
 	default:
 	}
 
@@ -396,7 +396,7 @@ func (f *sendReceiveFolder) processNeeded(ignores *ignore.Matcher, folderFiles *
 	for _, fi := range processDirectly {
 		select {
 		case <-f.ctx.Done():
-			return changed, fileDeletions, dirDeletions, f.ctx.Err()
+			return changed, finished, fileDeletions, dirDeletions, f.ctx.Err()
 		default:
 		}
 
@@ -443,7 +443,7 @@ nextFile:
 	for {
 		select {
 		case <-f.ctx.Done():
-			return changed, fileDeletions, dirDeletions, f.ctx.Err()
+			return changed, finished, fileDeletions, dirDeletions, f.ctx.Err()
 		default:
 		}
 
@@ -505,7 +505,6 @@ nextFile:
  						// false so the caller knows we did not do
  						// everything we could, and stop iterating.
  						finished = false
- 						return false
  					}
 
 				// Handle the file normally, by coping and pulling, etc.
