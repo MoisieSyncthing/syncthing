@@ -186,8 +186,6 @@ func (f *sendReceiveFolder) pull() bool {
  		if finished {
  			tries++
  		}
-		
-		changed = f.pullerIteration(curIgnores, folderFiles, ignoresChanged, scanChan)
 
 		select {
 		case <-f.ctx.Done():
